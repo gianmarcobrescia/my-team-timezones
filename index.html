@@ -4,22 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Team Timezone Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👥</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            font-family: 'Inter', sans-serif;
-        }
+        :root { font-family: 'Inter', sans-serif; }
         @supports (font-variation-settings: normal) {
-            :root {
-                font-family: 'Inter var', sans-serif;
-            }
+            :root { font-family: 'Inter var', sans-serif; }
         }
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+        body { font-family: 'Inter', sans-serif; }
         .loader {
             border: 2px solid #f3f3f3;
             border-top: 2px solid #3498db;
@@ -43,22 +38,9 @@
 
     <header class="mb-8">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
-            <div class="flex items-center justify-center md:justify-start gap-2 text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300">
-                <span>Hi! It's</span>
-                <span id="local-clock" class="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">...</span>
-                <span>in</span>
-                <div 
-                    class="relative rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors" 
-                    title="Change your local timezone"
-                >
-                    <select id="local-timezone-select" class="text-xl md:text-2xl font-semibold bg-transparent border-none p-1 rounded-md appearance-none text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer pr-8" style="border-bottom: 2px dotted currentColor;">
-                    </select>
-                    <span class="absolute top-1/2 right-1 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-lg pointer-events-none" aria-hidden="true">
-                        &#9662;
-                    </span>
-                </div>
-            </div>
-
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white text-center md:text-left">
+                My Team
+            </h1>
             <div class="flex items-center justify-center md:justify-end gap-3">
                 <button type="button" id="restore-team-btn" class="relative bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors group">
                     Restore Team
@@ -78,10 +60,8 @@
             <h2 class="text-2xl font-semibold mb-4">Your Dashboard is Empty</h2>
             <p class="text-lg">Click the "+ Add Tile" button to add your first team member.</p>
         </div>
-
         <div id="tile-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         </div>
-
         <section id="meeting-section" class="mt-12 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center justify-center gap-4 flex-wrap">
             <label for="meeting-time-input" class="text-lg font-medium">Team Time Converter:</label>
             <input type="time" id="meeting-time-input" class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-lg focus:ring-2 focus:ring-blue-500 outline-none">
@@ -94,23 +74,19 @@
             <h3 id="modal-title" class="text-2xl font-semibold mb-6">Create New Tile</h3>
             <form id="tile-form">
                 <input type="hidden" id="editing-tile-id">
-                
                 <div class="mb-4">
                     <label for="title-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title (Name)</label>
                     <input type="text" id="title-input" class="w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
                 </div>
-                
                 <div class="mb-6">
                     <label for="timezone-search-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search Timezone</label>
                     <input type="text" id="timezone-search-input" class="w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., London or New_York">
                 </div>
-
                 <div class="mb-6">
                     <label for="timezone-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Timezone</label>
                     <select id="timezone-select" class="w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required size="8">
                     </select>
                 </div>
-                
                 <div class="flex justify-end gap-3">
                     <button type="button" id="cancel-btn" class="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors">
                         Cancel
@@ -136,8 +112,6 @@
             const timezoneSelect = document.getElementById('timezone-select');
             const timezoneSearchInput = document.getElementById('timezone-search-input');
             const editingTileIdInput = document.getElementById('editing-tile-id');
-            const localClockEl = document.getElementById('local-clock');
-            const localTimezoneSelect = document.getElementById('local-timezone-select');
             const meetingTimeInput = document.getElementById('meeting-time-input');
             const clearMeetingTimeBtn = document.getElementById('clear-meeting-time-btn');
             const meetingSection = document.getElementById('meeting-section');
@@ -145,13 +119,9 @@
 
             let tiles = [];
             const STORAGE_KEY_TILES = 'timezoneTiles';
-            const STORAGE_KEY_LOCAL_TZ = 'localUserTimezone';
             const allTimezones = Intl.supportedValuesOf('timeZone');
             const allTimezoneOptions = allTimezones.map(tz => {
-                return {
-                    value: tz,
-                    text: tz.replace(/_/g, ' ')
-                };
+                return { value: tz, text: tz.replace(/_/g, ' ') };
             });
 
             const DEFAULT_TILES = [
@@ -166,20 +136,33 @@
                 { id: 1678886409, title: "Duncan", timezone: "Africa/Johannesburg" }
             ];
 
-            function getFormattedTime(timezone) {
+            function getFormattedTime(timezone, formatOptions) {
                 try {
-                    const now = new Date();
-                    const time = now.toLocaleTimeString('en-GB', {
-                        timeZone: timezone,
+                    const options = formatOptions || {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false
+                    };
+                    const time = new Date().toLocaleTimeString('en-GB', {
+                        timeZone: timezone,
+                        ...options
                     });
                     if (time.includes('Invalid')) return 'Error';
                     return time;
                 } catch (e) {
-                    console.error(`Invalid timezone: ${timezone}`, e);
                     return "Error";
+                }
+            }
+
+            function getDayPhaseIcon(timezone) {
+                try {
+                    const hour = parseInt(getFormattedTime(timezone, { hour: '2-digit', hour12: false }), 10);
+                    if (hour >= 9 && hour < 18) return '💻'; 
+                    if (hour >= 7 && hour < 9) return '🌅';  
+                    if (hour >= 18 && hour < 22) return '🌆'; 
+                    return '😴'; 
+                } catch (e) {
+                    return '❓';
                 }
             }
 
@@ -200,11 +183,6 @@
                 } catch (e) {
                     return 0;
                 }
-            }
-
-            function updateLocalClock() {
-                const selectedTimezone = localTimezoneSelect.value;
-                localClockEl.textContent = getFormattedTime(selectedTimezone);
             }
 
             function populateTimezoneDropdown(selectElement, timezones) {
@@ -239,16 +217,30 @@
                 timezoneEl.className = 'text-sm text-gray-500 dark:text-gray-400 mb-2';
                 timezoneEl.textContent = tile.timezone.replace(/_/g, ' ');
 
+                const clockWrapper = document.createElement('div');
+                clockWrapper.className = 'flex items-center gap-3';
+
                 const clockEl = document.createElement('p');
-                clockEl.className = 'text-5xl font-bold text-gray-800 dark:text-white';
+                clockEl.className = 'text-5xl font-bold text-blue-600 dark:text-blue-400';
                 clockEl.innerHTML = '<span class="loader"></span>';
+
+                const phaseIconEl = document.createElement('span');
+                phaseIconEl.className = 'text-3xl';
+                phaseIconEl.title = 'Current activity';
+                phaseIconEl.textContent = getDayPhaseIcon(tile.timezone);
+
+                clockWrapper.appendChild(clockEl);
+                clockWrapper.appendChild(phaseIconEl);
 
                 const meetingTimeEl = document.createElement('p');
                 meetingTimeEl.className = 'text-lg font-medium text-green-500 dark:text-green-400 mt-2 h-6';
 
                 const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'absolute top-3 right-3 text-gray-400 hover:text-red-500 text-3xl font-bold leading-none p-1 transition-colors';
-                deleteBtn.innerHTML = '&times;';
+                // Use a reliable SVG for the "X" icon instead of &times;
+                deleteBtn.className = 'absolute top-3 right-3 text-gray-400 hover:text-red-500 p-1 transition-colors rounded-full';
+                deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>`;
                 deleteBtn.setAttribute('aria-label', `Delete ${tile.title} tile`);
                 deleteBtn.onclick = () => deleteTile(tile.id);
 
@@ -261,7 +253,7 @@
                 tileEl.appendChild(deleteBtn);
                 tileEl.appendChild(titleEl);
                 tileEl.appendChild(timezoneEl);
-                tileEl.appendChild(clockEl);
+                tileEl.appendChild(clockWrapper);
                 tileEl.appendChild(meetingTimeEl);
                 tileEl.appendChild(editBtn);
                 tileGrid.appendChild(tileEl);
@@ -272,8 +264,12 @@
 
             function updateTileClock(tileEl, timezone) {
                 const clockEl = tileEl.querySelector('.text-5xl');
+                const phaseIconEl = tileEl.querySelector('.text-3xl');
                 if (clockEl) {
                     clockEl.textContent = getFormattedTime(timezone);
+                }
+                if(phaseIconEl) {
+                    phaseIconEl.textContent = getDayPhaseIcon(timezone);
                 }
             }
 
@@ -291,252 +287,204 @@
                 }
             }
 
-            function renderAllTiles() {
-                tileGrid.innerHTML = '';
-                const sortedTiles = [...tiles]
-                    .map(tile => ({
-                        ...tile,
-                        offset: getOffsetMinutes(tile.timezone)
-                    }))
-                    .sort((a, b) => a.offset - b.offset);
-                
-                sortedTiles.forEach(renderTile);
-                checkDashboardState();
+    function renderAllTiles() {
+        tileGrid.innerHTML = '';
+        const sortedTiles = [...tiles]
+            .map(tile => ({
+                ...tile,
+                offset: getOffsetMinutes(tile.timezone)
+            }))
+            .sort((a, b) => a.offset - b.offset);
+        
+        sortedTiles.forEach(renderTile);
+        checkDashboardState();
+    }
+
+    function checkDashboardState() {
+        if (tiles.length === 0) {
+            emptyState.style.display = 'block';
+            meetingSection.style.display = 'none';
+        } else {
+            emptyState.style.display = 'none';
+            meetingSection.style.display = 'flex';
+        }
+    }
+
+    function showModal() {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function showEditModal(tile) {
+        modalTitle.textContent = "Edit Tile";
+        titleInput.value = tile.title;
+        timezoneSearchInput.value = '';
+        filterTimezoneOptions();
+        timezoneSelect.value = tile.timezone;
+        editingTileIdInput.value = tile.id;
+        showModal();
+    }
+
+    function hideModal() {
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            tileForm.reset();
+            editingTileIdInput.value = '';
+        }, 300);
+    }
+
+    function handleSaveTile(e) {
+        e.preventDefault();
+        const title = titleInput.value.trim();
+        const timezone = timezoneSelect.value;
+        const editingId = editingTileIdInput.value;
+
+        if (!title || !timezone) {
+            alert('Please fill out all fields.');
+            return;
+        }
+
+        if (editingId) {
+            const tileIndex = tiles.findIndex(t => t.id == editingId);
+            if (tileIndex > -1) {
+                tiles[tileIndex].title = title;
+                tiles[tileIndex].timezone = timezone;
             }
+        } else {
+            const newTile = {
+                id: Date.now(),
+                title: title,
+                timezone: timezone
+            };
+            tiles.push(newTile);
+        }
+        
+        saveTilesToStorage();
+        renderAllTiles();
+        hideModal();
+    }
 
-            function checkDashboardState() {
-                if (tiles.length === 0) {
-                    emptyState.style.display = 'block';
-                    meetingSection.style.display = 'none';
-                } else {
-                    emptyState.style.display = 'none';
-                    meetingSection.style.display = 'flex';
-                }
+    function deleteTile(id) {
+        tiles = tiles.filter(tile => tile.id !== id);
+        saveTilesToStorage();
+        renderAllTiles();
+    }
+
+    function restoreDefaultTiles() {
+        const existingTitlesAndZones = new Set(tiles.map(t => `${t.title.toLowerCase()}|${t.timezone}`));
+        let tilesAdded = false;
+        DEFAULT_TILES.forEach(defaultTile => {
+            const checkKey = `${defaultTile.title.toLowerCase()}|${defaultTile.timezone}`;
+            if (!existingTitlesAndZones.has(checkKey)) {
+                tiles.push({ ...defaultTile, id: Date.now() + Math.random() });
+                tilesAdded = true;
             }
+        });
+        
+        if (tilesAdded) {
+            saveTilesToStorage();
+            renderAllTiles();
+        }
+    }
 
-            function showModal() {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    modal.querySelector('div').classList.remove('scale-95');
-                }, 10);
+    function updateAllTileClocks() {
+        document.querySelectorAll('#tile-grid > div').forEach(tileEl => {
+            const timezone = tileEl.dataset.timezone;
+            if (timezone) {
+                updateTileClock(tileEl, timezone);
             }
+        });
+    }
 
-            function showEditModal(tile) {
-                modalTitle.textContent = "Edit Tile";
-                titleInput.value = tile.title;
-                
-                timezoneSearchInput.value = '';
-                filterTimezoneOptions();
-                
-                timezoneSelect.value = tile.timezone;
-                editingTileIdInput.value = tile.id;
-                showModal();
+    function handleMeetingTimeChange() {
+        document.querySelectorAll('#tile-grid > div').forEach(tileEl => {
+            const timezone = tileEl.dataset.timezone;
+            if (timezone) {
+                updateTileMeetingTime(tileEl, timezone);
             }
-
-            function hideModal() {
-                modal.classList.add('opacity-0');
-                modal.querySelector('div').classList.add('scale-95');
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                    tileForm.reset();
-                    editingTileIdInput.value = '';
-                }, 300);
-            }
-
-            function handleSaveTile(e) {
-                e.preventDefault();
-                const title = titleInput.value.trim();
-                const timezone = timezoneSelect.value;
-                const editingId = editingTileIdInput.value;
-
-                if (!title || !timezone) {
-                    alert('Please fill out all fields.');
-                    return;
-                }
-
-                if (editingId) {
-                    const tileIndex = tiles.findIndex(t => t.id == editingId);
-                    if (tileIndex > -1) {
-                        tiles[tileIndex].title = title;
-                        tiles[tileIndex].timezone = timezone;
-                    }
-                } else {
-                    const newTile = {
-                        id: Date.now(),
-                        title: title,
-                        timezone: timezone
-                    };
-                    tiles.push(newTile);
-                }
-                
-                saveTilesToStorage();
-                renderAllTiles();
-                hideModal();
-            }
-
-            function deleteTile(id) {
-                tiles = tiles.filter(tile => tile.id !== id);
-                saveTilesToStorage();
-                renderAllTiles();
-            }
-
-            function restoreDefaultTiles() {
-                const existingTitlesAndZones = new Set(tiles.map(t => `${t.title.toLowerCase()}|${t.timezone}`));
-
-                DEFAULT_TILES.forEach(defaultTile => {
-                    const checkKey = `${defaultTile.title.toLowerCase()}|${defaultTile.timezone}`;
-                    if (!existingTitlesAndZones.has(checkKey)) {
-                        tiles.push({ ...defaultTile, id: Date.now() + Math.random() });
-                    }
-                });
-                
-                saveTilesToStorage();
-                renderAllTiles();
-            }
-
-            function updateAllTileClocks() {
-                document.querySelectorAll('#tile-grid > div').forEach(tileEl => {
-                    const timezone = tileEl.dataset.timezone;
-                    if (timezone) {
-                        updateTileClock(tileEl, timezone);
-                    }
-                });
-            }
-
-            function handleMeetingTimeChange() {
-                document.querySelectorAll('#tile-grid > div').forEach(tileEl => {
-                    const timezone = tileEl.dataset.timezone;
-                    if (timezone) {
-                        updateTileMeetingTime(tileEl, timezone);
-                    }
-                });
+        });
+    }
+    
+    function updateTileMeetingTime(tileEl, tileTimezone) {
+        const meetingTimeEl = tileEl.querySelector('.text-lg');
+        const localTimeInput = meetingTimeInput.value;
+        
+        if (!localTimeInput) {
+            meetingTimeEl.textContent = '';
+            return;
+        }
+        
+        const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        try {
+            const [hours, minutes] = localTimeInput.split(':');
+            const sourceDateStr = new Date().toLocaleDateString('en-CA', {timeZone: localTimezone});
+            const sourceDateTimeStr = `${sourceDateStr}T${localTimeInput}:00`;
+            const sourceDate = new Date(sourceDateTimeStr);
+            
+            const formattedTime = sourceDate.toLocaleTimeString('en-GB', {
+                timeZone: tileTimezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            
+            const targetDateStr = sourceDate.toLocaleDateString('en-CA', {timeZone: tileTimezone});
+            
+            let dayIndicator = "";
+            if (targetDateStr > sourceDateStr) {
+                dayIndicator = " (+1d)";
+            } else if (targetDateStr < sourceDateStr) {
+                dayIndicator = " (-1d)";
             }
             
-            function updateTileMeetingTime(tileEl, tileTimezone) {
-                const meetingTimeEl = tileEl.querySelector('.text-lg');
-                const localTimeInput = meetingTimeInput.value;
-                
-                if (!localTimeInput) {
-                    meetingTimeEl.textContent = '';
-                    return;
-                }
-                
-                const localTimezone = localTimezoneSelect.value;
-                const [hours, minutes] = localTimeInput.split(':');
-                
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = now.getMonth();
-                const day = now.getDate();
-                
-                let localDate;
-                try {
-                    const tempDate = new Date(Date.UTC(year, month, day, hours, minutes));
-                    const offset = getOffsetMinutes(localTimezone) / 60;
-                    const gmtTime = tempDate.getTime() - (offset * 3600 * 1000);
-                    
-                    const tzOffset = new Date().toLocaleString("en", {timeZone: localTimezone, timeStyle: "long"}).split(" ")[2];
-                    if (!tzOffset.includes("GMT")) {
-                        const dateInTZ = new Date(now.toLocaleString("en", {timeZone: localTimezone}));
-                        const justDate = new Date(dateInTZ.getFullYear(), dateInTZ.getMonth(), dateInTZ.getDate());
-                        localDate = new Date(justDate.getTime() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000));
-                    } else {
-                        const iso = new Date(year, month, day).toISOString().split('T')[0];
-                        const dateTimeString = `${iso}T${localTimeInput}:00`;
-                        const dateInLocalTZ = new Date(new Date(dateTimeString).toLocaleString('en-US', { timeZone: localTimezone }));
-                        const offsetFromUTC = (new Date(dateTimeString) - dateInLocalTZ) / (1000 * 60 * 60);
-                        localDate = new Date(Date.UTC(year, month, day, parseInt(hours) + offsetFromUTC, parseInt(minutes)));
-                    }
+            meetingTimeEl.textContent = `${formattedTime}${dayIndicator}`;
 
-                    // Fallback for simplicity: Assume local date parts
-                    const date = new Date();
-                    date.setHours(parseInt(hours));
-                    date.setMinutes(parseInt(minutes));
-                    date.setSeconds(0);
-                    date.setMilliseconds(0);
+        } catch (e) {
+            console.error("Error calculating meeting time:", e);
+            meetingTimeEl.textContent = 'Error';
+        }
+    }
 
-                    // Re-create date object in the *source* timezone
-                    const sourceDateStr = new Date().toLocaleDateString('en-CA', {timeZone: localTimezone}); // YYYY-MM-DD
-                    const sourceDateTimeStr = `${sourceDateStr}T${localTimeInput}:00`;
-                    
-                    // Create a date object that *represents* that time
-                    const sourceDate = new Date(sourceDateTimeStr);
-                    
-                    // Now format it in the *target* timezone
-                    const formattedTime = sourceDate.toLocaleTimeString('en-GB', {
-                        timeZone: tileTimezone,
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                    });
-                    
-                    const dayDiff = (sourceDate.toLocaleDateString('en-CA', {timeZone: tileTimezone}) !== sourceDate.toLocaleDateString('en-CA', {timeZone: localTimezone}));
-                    
-                    let dayIndicator = "";
-                    if (dayDiff) {
-                       const targetDate = new Date(sourceDate.toLocaleString('en-US', {timeZone: tileTimezone}));
-                       if (targetDate > sourceDate) {
-                           dayIndicator = " (+1d)";
-                       } else {
-                           dayIndicator = " (-1d)";
-                       }
-                    }
+    function init() {
+        populateTimezoneDropdown(timezoneSelect, allTimezoneOptions);
+        
+        loadTilesFromStorage();
+        renderAllTiles();
 
-                    meetingTimeEl.textContent = `${formattedTime}${dayIndicator}`;
+        setInterval(updateAllTileClocks, 1000 * 30);
 
-                } catch (e) {
-                    console.error("Error calculating meeting time:", e);
-                    meetingTimeEl.textContent = 'Error';
-                }
-            }
-
-            function init() {
-                populateTimezoneDropdown(timezoneSelect, allTimezoneOptions);
-                populateTimezoneDropdown(localTimezoneSelect, allTimezoneOptions.map(tz => ({ value: tz.value, text: tz.text })));
-
-                const savedLocalTZ = localStorage.getItem(STORAGE_KEY_LOCAL_TZ);
-                const userGuessTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                localTimezoneSelect.value = savedLocalTZ && allTimezones.includes(savedLocalTZ) ? savedLocalTZ : userGuessTZ;
-
-                loadTilesFromStorage();
-                renderAllTiles();
-
-                updateLocalClock();
-                setInterval(updateLocalClock, 1000 * 30);
-                setInterval(updateAllTileClocks, 1000 * 30);
-
-                addTileBtn.addEventListener('click', () => {
-                    modalTitle.textContent = "Create New Tile";
-                    editingTileIdInput.value = '';
-                    tileForm.reset();
-                    filterTimezoneOptions();
-                    showModal();
-                });
-                restoreTeamBtn.addEventListener('click', restoreDefaultTiles);
-                cancelBtn.addEventListener('click', hideModal);
-                tileForm.addEventListener('submit', handleSaveTile);
-                timezoneSearchInput.addEventListener('input', filterTimezoneOptions);
-                meetingTimeInput.addEventListener('input', handleMeetingTimeChange);
-                clearMeetingTimeBtn.addEventListener('click', () => {
-                    meetingTimeInput.value = '';
-                    handleMeetingTimeChange();
-                });
-                localTimezoneSelect.addEventListener('change', (e) => {
-                    localStorage.setItem(STORAGE_KEY_LOCAL_TZ, e.target.value);
-                    updateLocalClock();
-                    handleMeetingTimeChange();
-                });
-                
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        hideModal();
-                    }
-                });
-            }
-
-            init();
+        addTileBtn.addEventListener('click', () => {
+            modalTitle.textContent = "Create New Tile";
+            editingTileIdInput.value = '';
+            tileForm.reset();
+            filterTimezoneOptions();
+            showModal();
         });
-    </script>
+        restoreTeamBtn.addEventListener('click', restoreDefaultTiles);
+        cancelBtn.addEventListener('click', hideModal);
+        tileForm.addEventListener('submit', handleSaveTile);
+        timezoneSearchInput.addEventListener('input', filterTimezoneOptions);
+        meetingTimeInput.addEventListener('input', handleMeetingTimeChange);
+        clearMeetingTimeBtn.addEventListener('click', () => {
+            meetingTimeInput.value = '';
+            handleMeetingTimeChange();
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+    }
+
+    init();
+});
+</script>
 </body>
 </html>
