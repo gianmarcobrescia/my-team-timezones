@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timezone Dashboard</title>
-    <!-- 1. Load Tailwind CSS for styling -->
+    <title>My Team Timezone Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 2. Load Inter font family -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* 3. Apply the Inter font as the default sans-serif font */
-        body {
-            font-family: 'Inter', 'sans-serif';
+        :root {
+            font-family: 'Inter', sans-serif;
         }
-        /* Custom style for a subtle spinning loader */
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @supports (font-variation-settings: normal) {
+            :root {
+                font-family: 'Inter var', sans-serif;
+            }
+        }
+        body {
+            font-family: 'Inter', sans-serif;
         }
         .loader {
             border: 2px solid #f3f3f3;
@@ -29,8 +29,10 @@
             animation: spin 1s linear infinite;
             display: inline-block;
         }
-        
-        /* 4. Hide elements by default */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         #meeting-section,
         #empty-state {
             display: none;
@@ -39,638 +41,502 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen p-8 transition-colors duration-300">
 
-    <!-- Local Time Header -->
-    <div class="w-full text-center mb-4">
-        <p id="local-clock" class="text-lg text-gray-600 dark:text-gray-400">Hi! It's calculating your local time...</p>
-    </div>
-
-    <!-- Header -->
-    <header class="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold mb-4 sm:mb-0">My Team</h1>
-        
-        <!-- Button Container -->
-        <div class="flex items-center gap-4">
-            <!-- Restore Team Button with Tooltip -->
-            <div class="relative group">
-                <button id="restore-team-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                    Restore Team
-                </button>
-                <span class="absolute z-10 hidden group-hover:block w-max max-w-xs p-2 text-xs text-white bg-gray-700 rounded-lg shadow-lg -bottom-10 left-1/2 -translate-x-1/2">
-                    Restores any missing default team members.
-                </span>
+    <header class="mb-8">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
+            <div class="flex items-center justify-center md:justify-start gap-2 text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-300">
+                <span>Hi! It's</span>
+                <span id="local-clock" class="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">...</span>
+                <span>in</span>
+                <div 
+                    class="relative rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors" 
+                    title="Change your local timezone"
+                >
+                    <select id="local-timezone-select" class="text-xl md:text-2xl font-semibold bg-transparent border-none p-1 rounded-md appearance-none text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer pr-8" style="border-bottom: 2px dotted currentColor;">
+                    </select>
+                    <span class="absolute top-1/2 right-1 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-lg pointer-events-none" aria-hidden="true">
+                        &#9662;
+                    </span>
+                </div>
             </div>
-            
-            <!-- Add Tile Button -->
-            <button id="add-tile-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                + Add Tile
-            </button>
+
+            <div class="flex items-center justify-center md:justify-end gap-3">
+                <button type="button" id="restore-team-btn" class="relative bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors group">
+                    Restore Team
+                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-black text-white text-xs rounded-md p-2 opacity-0 group-hover:opacity-100 transition-opacity" role="tooltip">
+                        Add any missing default team members
+                    </span>
+                </button>
+                <button type="button" id="add-tile-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    + Add Tile
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Tile Grid -->
-    <main class="relative">
-        <!-- Empty State Message -->
-        <div id="empty-state" class="text-center p-10 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <main>
+        <div id="empty-state" class="text-center text-gray-500 dark:text-gray-400 py-16">
             <h2 class="text-2xl font-semibold mb-4">Your Dashboard is Empty</h2>
-            <p class="text-gray-600 dark:text-gray-400">Click the <span class="font-bold text-blue-600 dark:text-blue-400">+ Add Tile</span> button to get started!</p>
+            <p class="text-lg">Click the "+ Add Tile" button to add your first team member.</p>
         </div>
 
-        <!-- Tile Grid -->
-        <div id="tile-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Tiles will be dynamically injected here by JavaScript -->
+        <div id="tile-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         </div>
+
+        <section id="meeting-section" class="mt-12 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center justify-center gap-4 flex-wrap">
+            <label for="meeting-time-input" class="text-lg font-medium">Team Time Converter:</label>
+            <input type="time" id="meeting-time-input" class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <button type="button" id="clear-meeting-time-btn" class="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-2 px-3 rounded-lg text-lg leading-none" aria-label="Clear meeting time">&times;</button>
+        </section>
     </main>
 
-    <!-- Meeting Time Section (Now after the grid) -->
-    <section id="meeting-section" class="mt-8 mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center justify-center gap-4 flex-wrap">
-        <label for="meeting-time-input" class="text-lg font-medium">Team time converter:</label>
-        <input type="time" id="meeting-time-input" class="bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-lg focus:ring-2 focus:ring-blue-500 outline-none">
-        <button type="button" id="clear-meeting-time-btn" class="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-2 px-3 rounded-lg text-lg leading-none" aria-label="Clear meeting time">&times;</button>
-    </section>
-
-    <!-- Add/Edit Tile Modal (Hidden by default) -->
-    <div id="modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all scale-95 opacity-0" id="modal-content">
-            <h2 class="text-2xl font-bold mb-6" id="modal-title">Create New Tile</h2>
-            
-            <!-- Form -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 hidden transition-opacity duration-300 opacity-0" aria-modal="true" role="dialog">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 w-full max-w-md transform scale-95 transition-all duration-300">
+            <h3 id="modal-title" class="text-2xl font-semibold mb-6">Create New Tile</h3>
             <form id="tile-form">
-                <!-- Title Input -->
+                <input type="hidden" id="editing-tile-id">
+                
                 <div class="mb-4">
-                    <label for="tile-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                    <input type="text" id="tile-title" placeholder="e.g., 'Tokyo Office'" class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                    <label for="title-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title (Name)</label>
+                    <input type="text" id="title-input" class="w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="timezone-search-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search Timezone</label>
+                    <input type="text" id="timezone-search-input" class="w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g., London or New_York">
                 </div>
 
-                <!-- Timezone Section -->
                 <div class="mb-6">
-                    <!-- Search Input -->
-                    <label for="timezone-search-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search Timezone</label>
-                    <input type="text" id="timezone-search-input" placeholder="e.g., 'London' or 'Europe'" class="w-full p-3 mb-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                    
-                    <!-- Timezone Select -->
-                    <label for="tile-timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Timezone</label>
-                    <select id="tile-timezone" class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
-                        <option value="" disabled selected>Select a timezone...</option>
-                        <!-- Timezones will be populated by JS -->
+                    <label for="timezone-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Timezone</label>
+                    <select id="timezone-select" class="w-full p-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required size="8">
                     </select>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="flex justify-end gap-4">
-                    <button type="button" id="cancel-btn" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-bold py-2 px-5 rounded-lg transition-colors">
+                
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancel-btn" class="bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors">
                         Cancel
                     </button>
-                    <button type="submit" id="save-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition-colors">
-                        Save
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        Save Tile
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script type="module">
-        // --- DOM Elements ---
-        const tileGrid = document.getElementById('tile-grid');
-        const addTileBtn = document.getElementById('add-tile-btn');
-        const restoreTeamBtn = document.getElementById('restore-team-btn'); // New
-        const modal = document.getElementById('modal');
-        const modalContent = document.getElementById('modal-content');
-        const tileForm = document.getElementById('tile-form');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const titleInput = document.getElementById('tile-title');
-        const timezoneSearchInput = document.getElementById('timezone-search-input'); // New
-        const timezoneSelect = document.getElementById('tile-timezone'); 
-        const modalTitle = document.getElementById('modal-title');
-        const localClockEl = document.getElementById('local-clock');
-        const meetingTimeInput = document.getElementById('meeting-time-input');
-        const clearMeetingTimeBtn = document.getElementById('clear-meeting-time-btn');
-        const meetingSection = document.getElementById('meeting-section');
-        const emptyState = document.getElementById('empty-state');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tileGrid = document.getElementById('tile-grid');
+            const addTileBtn = document.getElementById('add-tile-btn');
+            const restoreTeamBtn = document.getElementById('restore-team-btn');
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const tileForm = document.getElementById('tile-form');
+            const titleInput = document.getElementById('title-input');
+            const timezoneSelect = document.getElementById('timezone-select');
+            const timezoneSearchInput = document.getElementById('timezone-search-input');
+            const editingTileIdInput = document.getElementById('editing-tile-id');
+            const localClockEl = document.getElementById('local-clock');
+            const localTimezoneSelect = document.getElementById('local-timezone-select');
+            const meetingTimeInput = document.getElementById('meeting-time-input');
+            const clearMeetingTimeBtn = document.getElementById('clear-meeting-time-btn');
+            const meetingSection = document.getElementById('meeting-section');
+            const emptyState = document.getElementById('empty-state');
 
-        // --- State ---
-        let tiles = []; // Our local array of tile objects
-        const STORAGE_KEY = 'timezoneTiles'; // Key for localStorage
-        const userLocalTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-        // Default tiles to load if storage is empty
-        const DEFAULT_TILES = [
-            { id: 1678886401, title: "Nigel", timezone: "Africa/Johannesburg" },
-            { id: 1678886402, title: "Pedro", timezone: "Europe/Lisbon" },
-            { id: 1678886403, title: "Timur", timezone: "Europe/Madrid" },
-            { id: 1678886404, title: "Gianmarco", timezone: "Europe/London" },
-            { id: 1678886405, title: "Rob", timezone: "Europe/London" },
-            { id: 1678886406, title: "Mykha", timezone: "America/Los_Angeles" },
-            { id: 1678886407, title: "TJ", timezone: "Africa/Johannesburg" },
-            { id: 1678886408, title: "Mundi", timezone: "Africa/Nairobi" }, // Changed to Kenya
-            { id: 1678886409, title: "Duncan", timezone: "Africa/Johannesburg" } // Cape Town uses same TZ
-        ];
-
-        // --- Functions ---
-
-        /**
-         * Formats a given timezone string into a human-readable HH:MM format (24h).
-         * @param {string} timezone - The IANA timezone name (e.g., "America/New_York")
-         * @param {Date} [date=new Date()] - Optional date object to format
-         * @returns {string} The formatted time string (e.g., "14:30")
-         */
-        function getFormattedTime(timezone, date = new Date()) {
-            try {
-                const options = {
-                    timeZone: timezone,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hourCycle: 'h23' // Explicitly set 24-hour format
+            let tiles = [];
+            const STORAGE_KEY_TILES = 'timezoneTiles';
+            const STORAGE_KEY_LOCAL_TZ = 'localUserTimezone';
+            const allTimezones = Intl.supportedValuesOf('timeZone');
+            const allTimezoneOptions = allTimezones.map(tz => {
+                return {
+                    value: tz,
+                    text: tz.replace(/_/g, ' ')
                 };
-                return date.toLocaleTimeString('en-GB', options);
-            } catch (e) {
-                console.error(`Invalid timezone: ${timezone}`, e);
-                return "Error";
+            });
+
+            const DEFAULT_TILES = [
+                { id: 1678886401, title: "Nigel", timezone: "Africa/Johannesburg" },
+                { id: 1678886402, title: "Pedro", timezone: "Europe/Lisbon" },
+                { id: 1678886403, title: "Timur", timezone: "Europe/Madrid" },
+                { id: 1678886404, title: "Gianmarco", timezone: "Europe/London" },
+                { id: 1678886405, title: "Rob", timezone: "Europe/London" },
+                { id: 1678886406, title: "Mykha", timezone: "America/Los_Angeles" },
+                { id: 1678886407, title: "TJ", timezone: "Africa/Johannesburg" },
+                { id: 1678886408, title: "Mundi", timezone: "Africa/Nairobi" },
+                { id: 1678886409, title: "Duncan", timezone: "Africa/Johannesburg" }
+            ];
+
+            function getFormattedTime(timezone) {
+                try {
+                    const now = new Date();
+                    const time = now.toLocaleTimeString('en-GB', {
+                        timeZone: timezone,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    if (time.includes('Invalid')) return 'Error';
+                    return time;
+                } catch (e) {
+                    console.error(`Invalid timezone: ${timezone}`, e);
+                    return "Error";
+                }
             }
-        }
 
-        /**
-         * Gets the current UTC offset in minutes for a given timezone.
-         * @param {string} timezone - The IANA timezone name
-         * @returns {number} The offset in minutes (e.g., -420 for UTC-7)
-         */
-        function getOffsetMinutes(timezone) {
-            try {
-                // Get the offset string (e.g., "GMT-7", "GMT+5:30")
-                const offsetString = new Intl.DateTimeFormat('en', { 
-                    timeZone: timezone, 
-                    timeZoneName: 'longOffset' 
-                }).formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value;
+            function getOffsetMinutes(timezone) {
+                try {
+                    const offsetString = new Intl.DateTimeFormat('en', { 
+                        timeZone: timezone, 
+                        timeZoneName: 'longOffset' 
+                    }).formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value;
 
-                if (!offsetString) return 0;
+                    if (!offsetString || !offsetString.includes('GMT')) return 0;
+                    
+                    const parts = offsetString.replace('GMT', '').split(':');
+                    const hours = parseInt(parts[0], 10) || 0;
+                    const minutes = parseInt(parts[1], 10) || 0;
 
-                // Extract hours and minutes
-                const parts = offsetString.replace('GMT', '').split(':');
-                const hours = parseInt(parts[0], 10) || 0;
-                const minutes = parseInt(parts[1], 10) || 0;
-
-                return (hours * 60) + (minutes * Math.sign(hours));
-            } catch (e) {
-                console.error(`Error getting offset for ${timezone}:`, e);
-                return 0;
+                    return (hours * 60) + (minutes * Math.sign(hours || 1));
+                } catch (e) {
+                    return 0;
+                }
             }
-        }
 
-        /**
-         * Updates the local clock display at the top of the page.
-         */
-        function updateLocalClock() {
-            const localTime = getFormattedTime(userLocalTimezone);
-            const timezoneFriendlyName = userLocalTimezone.replace(/_/g, ' ');
-            localClockEl.textContent = `Hi! It's ${localTime} in ${timezoneFriendlyName}`;
-        }
+            function updateLocalClock() {
+                const selectedTimezone = localTimezoneSelect.value;
+                localClockEl.textContent = getFormattedTime(selectedTimezone);
+            }
 
-        /**
-         * Populates the timezone dropdown with all IANA timezones.
-         */
-        function populateTimezoneDropdown() {
-            try {
-                const allTimezones = Intl.supportedValuesOf('timeZone');
-                
-                // Clear all but the first disabled option
-                timezoneSelect.options.length = 1; 
-                
-                allTimezones.forEach(tz => {
+            function populateTimezoneDropdown(selectElement, timezones) {
+                selectElement.innerHTML = '';
+                timezones.forEach(tz => {
                     const option = document.createElement('option');
-                    option.value = tz;
-                    option.textContent = tz.replace(/_/g, ' '); // Replace underscores for readability
-                    timezoneSelect.appendChild(option);
+                    option.value = tz.value;
+                    option.textContent = tz.text;
+                    selectElement.appendChild(option);
                 });
-            } catch (e) {
-                console.error("Could not populate timezones:", e);
-                // Can't do much if this fails, dropdown will just be empty
-            }
-        }
-        
-        /**
-         * Filters the timezone dropdown based on user input.
-         */
-        function handleTimezoneSearch() {
-            const searchTerm = timezoneSearchInput.value.toLowerCase().replace(/_/g, ' ');
-            const options = timezoneSelect.options;
-
-            // Reset "Select a timezone..." option
-            if (options.length > 0) {
-                options[0].style.display = '';
             }
 
-            for (let i = 1; i < options.length; i++) { // Start at 1 to skip "Select..."
-                const option = options[i];
-                const optionText = option.textContent.toLowerCase(); // Already has spaces
-                const optionValue = option.value.toLowerCase().replace(/_/g, ' '); // IANA value
+            function filterTimezoneOptions() {
+                const searchTerm = timezoneSearchInput.value.toLowerCase().replace(/_/g, ' ');
+                const filteredTimezones = allTimezoneOptions.filter(tz => {
+                    return tz.text.toLowerCase().includes(searchTerm);
+                });
+                populateTimezoneDropdown(timezoneSelect, filteredTimezones);
+            }
 
-                if (optionText.includes(searchTerm) || optionValue.includes(searchTerm)) {
-                    option.style.display = '';
+            function renderTile(tile) {
+                const tileEl = document.createElement('div');
+                tileEl.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col items-center justify-center relative min-h-[190px] transition-all transform hover:scale-105';
+                tileEl.dataset.id = tile.id;
+                tileEl.dataset.timezone = tile.timezone;
+
+                const titleEl = document.createElement('h3');
+                titleEl.className = 'text-xl font-semibold text-center';
+                titleEl.textContent = tile.title;
+
+                const timezoneEl = document.createElement('p');
+                timezoneEl.className = 'text-sm text-gray-500 dark:text-gray-400 mb-2';
+                timezoneEl.textContent = tile.timezone.replace(/_/g, ' ');
+
+                const clockEl = document.createElement('p');
+                clockEl.className = 'text-5xl font-bold text-gray-800 dark:text-white';
+                clockEl.innerHTML = '<span class="loader"></span>';
+
+                const meetingTimeEl = document.createElement('p');
+                meetingTimeEl.className = 'text-lg font-medium text-green-500 dark:text-green-400 mt-2 h-6';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'absolute top-3 right-3 text-gray-400 hover:text-red-500 text-3xl font-bold leading-none p-1 transition-colors';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.setAttribute('aria-label', `Delete ${tile.title} tile`);
+                deleteBtn.onclick = () => deleteTile(tile.id);
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'absolute bottom-3 right-3 text-gray-400 hover:text-blue-500 text-lg p-1 transition-colors';
+                editBtn.innerHTML = '&#9998;';
+                editBtn.setAttribute('aria-label', `Edit ${tile.title} tile`);
+                editBtn.onclick = () => showEditModal(tile);
+
+                tileEl.appendChild(deleteBtn);
+                tileEl.appendChild(titleEl);
+                tileEl.appendChild(timezoneEl);
+                tileEl.appendChild(clockEl);
+                tileEl.appendChild(meetingTimeEl);
+                tileEl.appendChild(editBtn);
+                tileGrid.appendChild(tileEl);
+
+                updateTileClock(tileEl, tile.timezone);
+                updateTileMeetingTime(tileEl, tile.timezone);
+            }
+
+            function updateTileClock(tileEl, timezone) {
+                const clockEl = tileEl.querySelector('.text-5xl');
+                if (clockEl) {
+                    clockEl.textContent = getFormattedTime(timezone);
+                }
+            }
+
+            function saveTilesToStorage() {
+                localStorage.setItem(STORAGE_KEY_TILES, JSON.stringify(tiles));
+            }
+
+            function loadTilesFromStorage() {
+                const savedTiles = localStorage.getItem(STORAGE_KEY_TILES);
+                if (savedTiles) {
+                    tiles = JSON.parse(savedTiles);
                 } else {
-                    option.style.display = 'none';
-                }
-            }
-
-            // If the currently selected item is now hidden, reset the selection
-            if (timezoneSelect.selectedIndex > 0 && timezoneSelect.options[timezoneSelect.selectedIndex].style.display === 'none') {
-                timezoneSelect.value = ""; // Reset to "Select a timezone..."
-            }
-        }
-
-        /**
-         * Resets the timezone filter, showing all options.
-         */
-        function resetTimezoneFilter() {
-            const options = timezoneSelect.options;
-            for (let i = 0; i < options.length; i++) {
-                options[i].style.display = '';
-            }
-        }
-
-        /**
-         * Renders a single tile object into the DOM.
-         */
-        function renderTile(tile) {
-            // Create the main tile element
-            const tileEl = document.createElement('div');
-            tileEl.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col items-center justify-center relative min-h-[190px] transition-all transform hover:scale-105';
-            tileEl.dataset.id = tile.id; // Store id and timezone in dataset for easy access
-            tileEl.dataset.timezone = tile.timezone;
-
-            // Create title
-            const titleEl = document.createElement('h3');
-            titleEl.className = 'text-xl font-semibold text-center';
-            titleEl.textContent = tile.title;
-
-            // Create timezone display
-            const timezoneEl = document.createElement('p');
-            timezoneEl.className = 'text-sm text-gray-500 dark:text-gray-400 mb-2';
-            timezoneEl.textContent = tile.timezone.replace(/_/g, ' ');
-
-            // Create clock display
-            const clockEl = document.createElement('p');
-            clockEl.className = 'text-5xl font-mono font-bold text-blue-600 dark:text-blue-400';
-            clockEl.id = `clock-${tile.id}`; // Unique ID for updating
-            clockEl.innerHTML = '<span class="loader"></span>'; // Show loader initially
-
-            // Create meeting time placeholder
-            const meetingTimeEl = document.createElement('p');
-            meetingTimeEl.id = `meeting-${tile.id}`;
-            meetingTimeEl.className = 'text-lg font-medium text-green-500 dark:text-green-400 mt-2 h-6'; // h-6 to prevent layout shift
-
-            // Create delete button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl font-bold leading-none transition-colors';
-            deleteBtn.innerHTML = '&times;'; // 'x' character
-            deleteBtn.setAttribute('aria-label', `Delete ${tile.title} tile`);
-            deleteBtn.onclick = () => deleteTile(tile.id);
-
-            // Create edit button
-            const editBtn = document.createElement('button');
-            editBtn.className = 'absolute bottom-3 right-3 text-gray-400 hover:text-blue-500 text-lg p-1 transition-colors';
-            editBtn.innerHTML = '&#9998;'; // Pencil icon
-            editBtn.setAttribute('aria-label', `Edit ${tile.title} tile`);
-            editBtn.onclick = () => showEditModal(tile);
-
-            // Assemble and append
-            tileEl.appendChild(deleteBtn);
-            tileEl.appendChild(titleEl);
-            tileEl.appendChild(timezoneEl);
-            tileEl.appendChild(clockEl);
-            tileEl.appendChild(meetingTimeEl); // Add the meeting time placeholder
-            tileEl.appendChild(editBtn);
-            tileGrid.appendChild(tileEl);
-
-            // Update the clock immediately
-            updateClockForTile(tile.id, tile.timezone);
-            
-            // Update meeting time if one is already selected
-            handleMeetingTimeChange();
-        }
-
-        /**
-         * Updates the text content of a single tile's clock.
-         * @param {string|number} id - The ID of the tile
-         * @param {string} timezone - The IANA timezone
-         */
-        function updateClockForTile(id, timezone) {
-            const clockEl = document.getElementById(`clock-${id}`);
-            if (clockEl) {
-                clockEl.textContent = getFormattedTime(timezone);
-            }
-        }
-
-        /**
-         * Loops through all rendered tiles and updates their clocks.
-         */
-        function updateAllClocks() {
-            const tilesInDOM = document.querySelectorAll('[data-timezone]');
-            tilesInDOM.forEach(tileEl => {
-                const { id, timezone } = tileEl.dataset;
-                if (id && timezone) {
-                    updateClockForTile(id, timezone);
-                }
-            });
-        }
-
-        /**
-         * Calculates and displays the meeting time for all tiles.
-         */
-        function handleMeetingTimeChange() {
-            const localTimeString = meetingTimeInput.value;
-
-            // Loop through all tiles in the DOM
-            const tilesInDOM = document.querySelectorAll('[data-timezone]');
-            
-            if (!localTimeString) {
-                // If input is empty, clear all meeting times
-                tilesInDOM.forEach(tileEl => {
-                    const meetingEl = document.getElementById(`meeting-${tileEl.dataset.id}`);
-                    if (meetingEl) meetingEl.textContent = '';
-                });
-                return;
-            }
-
-            // Create a date object based on today's date and the selected time
-            const [hours, minutes] = localTimeString.split(':');
-            const localDate = new Date();
-            localDate.setHours(hours, minutes, 0, 0); // Set time in local timezone
-
-            // Now, display this time converted for each tile
-            tilesInDOM.forEach(tileEl => {
-                const { id, timezone } = tileEl.dataset;
-                const meetingEl = document.getElementById(`meeting-${id}`);
-                
-                if (meetingEl) {
-                    const convertedTime = getFormattedTime(timezone, localDate);
-                    meetingEl.textContent = convertedTime;
-                }
-            });
-        }
-
-        /**
-         * Saves the current `tiles` array to localStorage.
-         */
-        function saveTilesToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tiles));
-        }
-
-        /**
-         * Loads tiles from localStorage into the `tiles` array.
-         */
-        function loadTilesFromStorage() {
-            const savedTiles = localStorage.getItem(STORAGE_KEY);
-            if (savedTiles) {
-                tiles = JSON.parse(savedTiles);
-            } else {
-                // If no tiles are in storage, load the defaults
-                tiles = DEFAULT_TILES;
-                saveTilesToStorage(); // And save them
-            }
-        }
-        
-        /**
-         * Renders all tiles from the global `tiles` array, sorted by timezone.
-         */
-        function renderAllTiles() {
-            tileGrid.innerHTML = ''; // Clear the grid
-            
-            // Create a sorted copy of the tiles
-            const sortedTiles = [...tiles]
-                .map(tile => ({
-                    ...tile,
-                    offset: getOffsetMinutes(tile.timezone) // Add offset for sorting
-                }))
-                .sort((a, b) => a.offset - b.offset); // Sort by offset
-
-            sortedTiles.forEach(renderTile);
-            checkDashboardState(); // Update UI based on tile count
-        }
-        
-        /**
-         * Shows/hides the meeting section and empty state based on tile count.
-         */
-        function checkDashboardState() {
-            if (tiles.length > 0) {
-                emptyState.style.display = 'none';
-                meetingSection.style.display = 'flex'; // Show meeting section
-            } else {
-                emptyState.style.display = 'block'; // Show empty state
-                meetingSection.style.display = 'none';
-            }
-        }
-
-        /**
-         * Shows the modal for creating a new tile.
-         */
-        function showCreateModal() {
-            tileForm.dataset.editingId = ''; // Ensure we are in 'create' mode
-            modalTitle.textContent = "Create New Tile";
-            tileForm.reset(); // Clear any previous input (clears search)
-            resetTimezoneFilter(); // Show all options
-            timezoneSelect.value = ""; // Ensure dropdown is reset
-
-            modal.classList.remove('hidden');
-            // Animate in
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10); // Short delay to allow CSS to apply 'hidden' removal
-        }
-
-        /**
-         * Pre-fills and shows the modal for editing an existing tile.
-         * @param {object} tile - The tile object to edit
-         */
-        function showEditModal(tile) {
-            tileForm.dataset.editingId = tile.id;
-            modalTitle.textContent = "Edit Tile";
-            tileForm.reset(); // Clear search input
-            resetTimezoneFilter(); // Show all options
-
-            // Pre-fill
-            titleInput.value = tile.title;
-            timezoneSelect.value = tile.timezone; // Set dropdown value
-            
-            modal.classList.remove('hidden');
-            // Animate in
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        /**
-         * Hides the modal with transition effects.
-         */
-        function hideModal() {
-            modalContent.classList.add('scale-95', 'opacity-0');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            // Wait for animation to finish before hiding
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200); // Must match transition duration
-        }
-
-        /**
-         * Handles the form submission to save a new or edited tile.
-         * @param {Event} e - The form submit event
-         */
-        function handleSaveTile(e) {
-            e.preventDefault(); // Prevent full page reload
-            
-            const title = titleInput.value.trim();
-            const timezone = timezoneSelect.value; // Get value from select
-
-            if (!title || !timezone) {
-                // This check is simple. The browser's `required` attribute handles most of it.
-                return;
-            }
-            
-            // No validation needed for dropdown
-
-            const editingId = tileForm.dataset.editingId;
-
-            if (editingId) {
-                // --- EDITING LOGIC ---
-                const tileIndex = tiles.findIndex(t => t.id == editingId); // Use == for string/number comparison
-                if (tileIndex > -1) {
-                    tiles[tileIndex].title = title;
-                    tiles[tileIndex].timezone = timezone;
+                    tiles = [...DEFAULT_TILES];
                     saveTilesToStorage();
-                    renderAllTiles(); // Easiest way to update the specific tile
                 }
-            } else {
-                // --- CREATING NEW LOGIC ---
-                const newTile = {
-                    id: Date.now(), // Simple unique ID
-                    title: title,
-                    timezone: timezone
-                };
-    
-                // Add to state, save, and render
-                tiles.push(newTile);
-                saveTilesToStorage();
-                renderAllTiles(); // Re-render all to maintain sort order
-                checkDashboardState(); // Update UI
-            }
-            
-            hideModal();
-        }
-
-        /**
-         * Deletes a tile by its ID.
-         * @param {string|number} id - The ID of the tile to delete
-         */
-        function deleteTile(id) {
-            // Find the tile in the DOM and add a removal animation
-            const tileEl = document.querySelector(`[data-id="${id}"]`);
-            if (tileEl) {
-                tileEl.classList.add('opacity-0', 'scale-75', '-rotate-12');
             }
 
-            // Wait for animation to finish before removing from state and DOM
-            setTimeout(() => {
-                // Remove from state
-                tiles = tiles.filter(tile => tile.id != id); // Use != for string/number comparison
+            function renderAllTiles() {
+                tileGrid.innerHTML = '';
+                const sortedTiles = [...tiles]
+                    .map(tile => ({
+                        ...tile,
+                        offset: getOffsetMinutes(tile.timezone)
+                    }))
+                    .sort((a, b) => a.offset - b.offset);
                 
-                // Save updated state
-                saveTilesToStorage();
+                sortedTiles.forEach(renderTile);
+                checkDashboardState();
+            }
+
+            function checkDashboardState() {
+                if (tiles.length === 0) {
+                    emptyState.style.display = 'block';
+                    meetingSection.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    meetingSection.style.display = 'flex';
+                }
+            }
+
+            function showModal() {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modal.querySelector('div').classList.remove('scale-95');
+                }, 10);
+            }
+
+            function showEditModal(tile) {
+                modalTitle.textContent = "Edit Tile";
+                titleInput.value = tile.title;
                 
-                // Remove from DOM
-                if (tileEl) {
-                    tileEl.remove();
+                timezoneSearchInput.value = '';
+                filterTimezoneOptions();
+                
+                timezoneSelect.value = tile.timezone;
+                editingTileIdInput.value = tile.id;
+                showModal();
+            }
+
+            function hideModal() {
+                modal.classList.add('opacity-0');
+                modal.querySelector('div').classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    tileForm.reset();
+                    editingTileIdInput.value = '';
+                }, 300);
+            }
+
+            function handleSaveTile(e) {
+                e.preventDefault();
+                const title = titleInput.value.trim();
+                const timezone = timezoneSelect.value;
+                const editingId = editingTileIdInput.value;
+
+                if (!title || !timezone) {
+                    alert('Please fill out all fields.');
+                    return;
                 }
 
-                checkDashboardState(); // Update UI
-            }, 300); // Matches transition duration
-        }
-
-        /**
-         * Adds any missing default team members back to the list.
-         */
-        function restoreDefaultTiles() {
-            let tilesAdded = false;
-            
-            DEFAULT_TILES.forEach((defaultTile, i) => {
-                // Check if a tile with the same title AND timezone already exists
-                const exists = tiles.some(t => 
-                    t.title.toLowerCase() === defaultTile.title.toLowerCase() && 
-                    t.timezone === defaultTile.timezone
-                );
-                
-                if (!exists) {
+                if (editingId) {
+                    const tileIndex = tiles.findIndex(t => t.id == editingId);
+                    if (tileIndex > -1) {
+                        tiles[tileIndex].title = title;
+                        tiles[tileIndex].timezone = timezone;
+                    }
+                } else {
                     const newTile = {
-                        ...defaultTile, //
-                        id: Date.now() + i // Create a new unique ID
+                        id: Date.now(),
+                        title: title,
+                        timezone: timezone
                     };
                     tiles.push(newTile);
-                    tilesAdded = true;
                 }
-            });
-
-            if (tilesAdded) {
+                
                 saveTilesToStorage();
-                renderAllTiles(); // Re-render to show new tiles and re-sort
-            } else {
-                // Optional: Feedback if no tiles were added
-                // For now, nothing happens, which is fine.
+                renderAllTiles();
+                hideModal();
             }
-        }
 
-        /**
-         * Initializes the application.
-         */
-        function init() {
-            // 1. Populate the dropdown
-            populateTimezoneDropdown();
-            
-            // 2. Load data from storage
-            loadTilesFromStorage();
-            
-            // 3. Render all existing tiles (which also calls checkDashboardState)
-            renderAllTiles();
+            function deleteTile(id) {
+                tiles = tiles.filter(tile => tile.id !== id);
+                saveTilesToStorage();
+                renderAllTiles();
+            }
 
-            // 4. Update local clock immediately
-            updateLocalClock();
+            function restoreDefaultTiles() {
+                const existingTitlesAndZones = new Set(tiles.map(t => `${t.title.toLowerCase()}|${t.timezone}`));
+
+                DEFAULT_TILES.forEach(defaultTile => {
+                    const checkKey = `${defaultTile.title.toLowerCase()}|${defaultTile.timezone}`;
+                    if (!existingTitlesAndZones.has(checkKey)) {
+                        tiles.push({ ...defaultTile, id: Date.now() + Math.random() });
+                    }
+                });
+                
+                saveTilesToStorage();
+                renderAllTiles();
+            }
+
+            function updateAllTileClocks() {
+                document.querySelectorAll('#tile-grid > div').forEach(tileEl => {
+                    const timezone = tileEl.dataset.timezone;
+                    if (timezone) {
+                        updateTileClock(tileEl, timezone);
+                    }
+                });
+            }
+
+            function handleMeetingTimeChange() {
+                document.querySelectorAll('#tile-grid > div').forEach(tileEl => {
+                    const timezone = tileEl.dataset.timezone;
+                    if (timezone) {
+                        updateTileMeetingTime(tileEl, timezone);
+                    }
+                });
+            }
             
-            // 5. Start the clock update interval (every 10 seconds is efficient)
-            setInterval(() => {
-                updateAllClocks();
+            function updateTileMeetingTime(tileEl, tileTimezone) {
+                const meetingTimeEl = tileEl.querySelector('.text-lg');
+                const localTimeInput = meetingTimeInput.value;
+                
+                if (!localTimeInput) {
+                    meetingTimeEl.textContent = '';
+                    return;
+                }
+                
+                const localTimezone = localTimezoneSelect.value;
+                const [hours, minutes] = localTimeInput.split(':');
+                
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                const day = now.getDate();
+                
+                let localDate;
+                try {
+                    const tempDate = new Date(Date.UTC(year, month, day, hours, minutes));
+                    const offset = getOffsetMinutes(localTimezone) / 60;
+                    const gmtTime = tempDate.getTime() - (offset * 3600 * 1000);
+                    
+                    const tzOffset = new Date().toLocaleString("en", {timeZone: localTimezone, timeStyle: "long"}).split(" ")[2];
+                    if (!tzOffset.includes("GMT")) {
+                        const dateInTZ = new Date(now.toLocaleString("en", {timeZone: localTimezone}));
+                        const justDate = new Date(dateInTZ.getFullYear(), dateInTZ.getMonth(), dateInTZ.getDate());
+                        localDate = new Date(justDate.getTime() + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000));
+                    } else {
+                        const iso = new Date(year, month, day).toISOString().split('T')[0];
+                        const dateTimeString = `${iso}T${localTimeInput}:00`;
+                        const dateInLocalTZ = new Date(new Date(dateTimeString).toLocaleString('en-US', { timeZone: localTimezone }));
+                        const offsetFromUTC = (new Date(dateTimeString) - dateInLocalTZ) / (1000 * 60 * 60);
+                        localDate = new Date(Date.UTC(year, month, day, parseInt(hours) + offsetFromUTC, parseInt(minutes)));
+                    }
+
+                    // Fallback for simplicity: Assume local date parts
+                    const date = new Date();
+                    date.setHours(parseInt(hours));
+                    date.setMinutes(parseInt(minutes));
+                    date.setSeconds(0);
+                    date.setMilliseconds(0);
+
+                    // Re-create date object in the *source* timezone
+                    const sourceDateStr = new Date().toLocaleDateString('en-CA', {timeZone: localTimezone}); // YYYY-MM-DD
+                    const sourceDateTimeStr = `${sourceDateStr}T${localTimeInput}:00`;
+                    
+                    // Create a date object that *represents* that time
+                    const sourceDate = new Date(sourceDateTimeStr);
+                    
+                    // Now format it in the *target* timezone
+                    const formattedTime = sourceDate.toLocaleTimeString('en-GB', {
+                        timeZone: tileTimezone,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    
+                    const dayDiff = (sourceDate.toLocaleDateString('en-CA', {timeZone: tileTimezone}) !== sourceDate.toLocaleDateString('en-CA', {timeZone: localTimezone}));
+                    
+                    let dayIndicator = "";
+                    if (dayDiff) {
+                       const targetDate = new Date(sourceDate.toLocaleString('en-US', {timeZone: tileTimezone}));
+                       if (targetDate > sourceDate) {
+                           dayIndicator = " (+1d)";
+                       } else {
+                           dayIndicator = " (-1d)";
+                       }
+                    }
+
+                    meetingTimeEl.textContent = `${formattedTime}${dayIndicator}`;
+
+                } catch (e) {
+                    console.error("Error calculating meeting time:", e);
+                    meetingTimeEl.textContent = 'Error';
+                }
+            }
+
+            function init() {
+                populateTimezoneDropdown(timezoneSelect, allTimezoneOptions);
+                populateTimezoneDropdown(localTimezoneSelect, allTimezoneOptions.map(tz => ({ value: tz.value, text: tz.text })));
+
+                const savedLocalTZ = localStorage.getItem(STORAGE_KEY_LOCAL_TZ);
+                const userGuessTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                localTimezoneSelect.value = savedLocalTZ && allTimezones.includes(savedLocalTZ) ? savedLocalTZ : userGuessTZ;
+
+                loadTilesFromStorage();
+                renderAllTiles();
+
                 updateLocalClock();
-            }, 10000);
+                setInterval(updateLocalClock, 1000 * 30);
+                setInterval(updateAllTileClocks, 1000 * 30);
 
-            // 6. Set up event listeners
-            addTileBtn.addEventListener('click', showCreateModal);
-            restoreTeamBtn.addEventListener('click', restoreDefaultTiles); // New
-            cancelBtn.addEventListener('click', hideModal);
-            tileForm.addEventListener('submit', handleSaveTile);
-            meetingTimeInput.addEventListener('input', handleMeetingTimeChange);
-            clearMeetingTimeBtn.addEventListener('click', () => {
-                meetingTimeInput.value = '';
-                handleMeetingTimeChange();
-            });
-            
-            // New listener for timezone search
-            timezoneSearchInput.addEventListener('input', handleTimezoneSearch);
-            
-            // Close modal if user clicks on the backdrop
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    hideModal();
-                }
-            });
+                addTileBtn.addEventListener('click', () => {
+                    modalTitle.textContent = "Create New Tile";
+                    editingTileIdInput.value = '';
+                    tileForm.reset();
+                    filterTimezoneOptions();
+                    showModal();
+                });
+                restoreTeamBtn.addEventListener('click', restoreDefaultTiles);
+                cancelBtn.addEventListener('click', hideModal);
+                tileForm.addEventListener('submit', handleSaveTile);
+                timezoneSearchInput.addEventListener('input', filterTimezoneOptions);
+                meetingTimeInput.addEventListener('input', handleMeetingTimeChange);
+                clearMeetingTimeBtn.addEventListener('click', () => {
+                    meetingTimeInput.value = '';
+                    handleMeetingTimeChange();
+                });
+                localTimezoneSelect.addEventListener('change', (e) => {
+                    localStorage.setItem(STORAGE_KEY_LOCAL_TZ, e.target.value);
+                    updateLocalClock();
+                    handleMeetingTimeChange();
+                });
+                
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        hideModal();
+                    }
+                });
+            }
 
-            // Close modal on 'Escape' key press
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    hideModal();
-                }
-            });
-        }
-
-        // --- Run Application ---
-        // Wait for the DOM to be fully loaded before running init
-        document.addEventListener('DOMContentLoaded', init);
+            init();
+        });
     </script>
 </body>
 </html>
